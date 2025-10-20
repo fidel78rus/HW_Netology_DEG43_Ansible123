@@ -1,2 +1,1 @@
-# HW_Netology_DEG43_Ansible123
-Домашняя работа
+ansible-playbook -i inventory.ini homework.yaml
