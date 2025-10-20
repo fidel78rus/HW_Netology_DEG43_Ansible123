@@ -1,0 +1,52 @@
+---
+- name: Подготовка хостов netology-ml
+  hosts: netology-hosts
+  become: yes
+  vars:
+    required_packages:
+      - net-tools
+      - git
+      - tree
+      - htop
+      - mc
+      - vim
+    groups_and_users:
+      - name: devops_1
+        group_name: devops_1
+      - name: test_1
+        group_name: test_1
+
+  tasks:
+    - name: Проверка доступности хостов
+      ansible.builtin.ping:
+
+    - name: Обновление списка пакетов
+      ansible.builtin.apt:
+        update_cache: yes
+
+    - name: Установка необходимых пакетов
+      ansible.builtin.apt:
+        name: "{{ required_packages }}"
+        state: present
+
+    - name: Копирование тестового файла test.txt
+      ansible.builtin.copy:
+        content: |
+          Это тестовый файл test.txt.
+          Создан с помощью Ansible.
+        dest: /tmp/test.txt
+
+    - name: Создание групп
+      ansible.builtin.group:
+        name: "{{ item.group_name }}"
+        state: present
+      loop: "{{ groups_and_users }}"
+
+    - name: Создание пользователей и директорий
+      ansible.builtin.user:
+        name: "{{ item.name }}"
+        group: "{{ item.group_name }}"
+        home: "/home/{{ item.name }}"
+        state: present
+      loop: "{{ groups_and_users }}"
+
